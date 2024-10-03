@@ -1,0 +1,168 @@
+{% extends '_base.html' %}
+{% load static %}
+{% block title %}NETNOOK{% endblock %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<div class="p-0 m-0">
+    <section class="relative min-h-screen w-full flex items-center justify-center">
+        <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-80 z-10"></div>
+        <div class="relative w-full h-full text-center z-20">
+            <div class="relative w-full h-full">
+                <img id="slideImage" class="w-full h-full object-cover" src="{% static 'slideimg/blackpanther2.png' %}" alt="Slide Image" style="max-height: 100vh;">
+            </div>
+            <button id="prevSlide" class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-4 rounded-full hover:bg-opacity-75 transition duration-300 ease-in-out shadow-lg hover:shadow-xl flex items-center justify-center z-30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+
+            <button id="nextSlide" class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-4 rounded-full hover:bg-opacity-75 transition duration-300 ease-in-out shadow-lg hover:shadow-xl flex items-center justify-center z-30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </div>
+    </section>
+
+    <div class="mb-8 p-4">
+        <h2 class="text-2xl font-bold text-red-600 mb-4">
+            Top pick <span class="text-white">TV shows and movies just for you</span>
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% for i in "123456" %}
+            <div class="relative group">
+                <a href="{% url 'toppick' i %}" class="block">
+                    <img src="{% static 'images/POSTER'|add:i|add:'.png' %}" alt="Movie {{ i }}" class="w-3/4 h-auto mx-auto object-cover transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:shadow-xl group-hover:ring-4 group-hover:ring-red-500">
+                </a>
+                <!-- ปุ่มเพิ่มหนังที่ชอบ -->
+                <button class="favorite-btn absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-red-500 to-red-700 text-white py-2 px-4 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg hover:scale-105 hover:ring-4 hover:ring-red-300 hover:shadow-2xl" data-movie-id="{{ i }}">
+                    Add to Favorites
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block script %}
+<!-- เพิ่ม CSS สำหรับการแจ้งเตือน -->
+<style>
+    .alert {
+        position: fixed;
+        bottom: 20px; /* ตั้งตำแหน่งให้อยู่ที่ด้านล่าง */
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        width: 90%; /* ปรับความกว้างตามต้องการ */
+        max-width: 400px; /* กำหนดความกว้างสูงสุด */
+        background: rgba(0, 0, 0, 0.8); /* เปลี่ยนเป็นพื้นหลังโปร่งใส */
+        border-radius: 8px; /* เพิ่มความมนให้มุม */
+        color: white; /* เปลี่ยนข้อความให้เป็นสีขาว */
+        opacity: 0; /* เริ่มต้นที่ความโปร่งใส 0 */
+        transition: opacity 1s ease; /* เพิ่มการเปลี่ยนแปลง opacity */
+    }
+    .alert-show {
+        opacity: 1; /* เมื่อแสดงผลจะมีความโปร่งใส 1 */
+    }
+    .alert-hidden {
+        opacity: 0; /* เมื่อซ่อนจะมีความโปร่งใส 0 */
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // เริ่มส่วนการทำงานของสไลด์รูปภาพ
+        const slideImage = document.getElementById('slideImage');
+        const imagePaths = [
+            "{% static 'slideimg/blackpanther2.png' %}",
+            "{% static 'slideimg/titanic3.png' %}",
+            "{% static 'slideimg/moonfall2.png' %}",
+            "{% static 'slideimg/green2.png' %}"
+        ];
+        
+        let currentIndex = 0;
+
+        function updateImage() {
+            slideImage.style.transition = 'opacity 0.5s ease-in-out';
+            slideImage.style.opacity = 0; 
+            setTimeout(() => {
+                slideImage.src = imagePaths[currentIndex];
+                slideImage.style.opacity = 1; 
+            }, 500);
+        }
+
+        document.getElementById('nextSlide').addEventListener('click', function () {
+            currentIndex = (currentIndex + 1) % imagePaths.length; 
+            updateImage();
+        });
+
+        document.getElementById('prevSlide').addEventListener('click', function () {
+            currentIndex = (currentIndex - 1 + imagePaths.length) % imagePaths.length; 
+            updateImage();
+        });
+        // จบส่วนการทำงานของสไลด์รูปภาพ
+
+        // เริ่มส่วนการทำงานของปุ่ม Favorite
+        const favoriteButtons = document.querySelectorAll('.favorite-btn');
+
+        favoriteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const movieId = this.getAttribute('data-movie-id');
+
+                // ส่งข้อมูลไปยัง Django view โดยใช้ fetch API
+                fetch('/add_favorite/', { // เปลี่ยน URL ตาม route ของคุณ
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}' // ใช้ CSRF token
+                    },
+                    body: JSON.stringify({ movie_id: movieId }) // ส่ง ID ของหนัง
+                })
+                .then(response => response.json())
+                .then(data => {
+                    showAlert(data.success ? 'Success! Added to favorites!' : 'Error! Failed to add to favorites.', data.success);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('Error! An error occurred.', false);
+                });
+            });
+        });
+        // จบส่วนการทำงานของปุ่ม Favorite
+
+        function showAlert(message, isSuccess) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-show`; // เพิ่มคลาสการแสดง
+            alertDiv.innerHTML = `
+                <div class="p-2 items-center text-indigo-100 leading-none flex lg:inline-flex" role="alert">
+                    <span class="flex rounded-full bg-red-500 uppercase px-2 py-1 text-xs font-bold mr-3">${isSuccess ? 'Success' : 'Error'}</span>
+                    <span class="font-semibold mr-2 text-left flex-auto">${message}</span>
+                    <svg class="fill-current opacity-75 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M12.95 10.707l.707-.707L8 4.343 6.586 5.757 10.828 10l-4.242 4.243L8 15.657l4.95-4.95z"/></svg>
+                </div>
+            `;
+            document.body.appendChild(alertDiv);
+
+            // แสดงการแจ้งเตือน
+            setTimeout(() => {
+                alertDiv.classList.add('alert-show'); // เพิ่มคลาสเพื่อแสดง
+            }, 10); // หน่วงเวลาเล็กน้อยเพื่อให้การแสดงผลมีการเปลี่ยนแปลง
+
+            // ปิดการแจ้งเตือนหลังจาก 3 วินาที
+            setTimeout(() => {
+                alertDiv.classList.add('alert-hidden'); // เริ่มให้การแจ้งเตือนเริ่ม fade out
+                setTimeout(() => {
+                    alertDiv.remove(); // ลบการแจ้งเตือนออกจาก DOM
+                }, 500); // ให้เวลาสำหรับการเคลื่อนไหว
+            }, 3000);
+        }
+    });
+</script>
+
+{% endblock script %}
