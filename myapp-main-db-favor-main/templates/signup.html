@@ -7,9 +7,9 @@ Signup NETNOOK
 
 {% block content %}
 <div class="flex h-screen items-center justify-center bg-gradient-to-r from-black via-black-900 to-red-900">
-    <div class="bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full animate-slide-in-right"> <!-- Slide-in animation for the form -->
+    <div class="bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full animate-slide-in-right">
         <header class="mb-6">
-            <img class="w-20 mx-auto mb-5 animate-fade-in" src="{% static 'images/logo.png' %}" alt="Movie NN Review Logo"> <!-- Fade-in animation for the logo -->
+            <img class="w-20 mx-auto mb-5 animate-fade-in" src="{% static 'images/logo.png' %}" alt="Movie NN Review Logo">
         </header>
 
         {% if messages %}
@@ -32,14 +32,17 @@ Signup NETNOOK
                 <input class="w-full p-3 text-gray-900 rounded-md border border-gray-600 bg-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 animate-fade-in" type="password" name="password" placeholder="Password" required>
             </div>
 
+            <div class="flex items-center mb-4">
+                <input id="terms" type="checkbox" name="terms" class="mr-2 rounded" required>
+                <label for="terms" class="text-gray-300 text-sm">Please accept to create a user.</label>
+            </div>
+
             <div class="flex justify-between">
-                <button class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-transform duration-200 ease-in-out transform hover:scale-105" type="submit">Sign Up</button> <!-- Button hover animation -->
+                <button class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-transform duration-200 ease-in-out transform hover:scale-105" type="submit">Sign Up</button>
             </div>
         </form>
     </div>
 </div>
-
-<!-- Custom Animations -->
 <style>
     @keyframes fadeIn {
         from {

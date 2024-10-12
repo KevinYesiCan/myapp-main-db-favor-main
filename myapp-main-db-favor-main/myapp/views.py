@@ -17,7 +17,6 @@ from .models import FavoriteMovie
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
 
-
 def index(request):
     return render(request, 'index.html')
 from .models import Movie
@@ -114,6 +113,11 @@ def add_user_view(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
+        terms_accepted = request.POST.get('terms')
+        
+        if not terms_accepted:
+            messages.error(request, "You must accept the terms and conditions to sign up.")
+            return redirect('signup')
         
         # เพิ่มการสร้างผู้ใช้ใหม่
         if User.objects.filter(username=username).exists():
@@ -450,4 +454,4 @@ def search_movies(request):
     for id, movie in movies.items():
         if movie['title'].lower() == query.lower():
             return redirect(reverse('toppick', args=[id]))
-    return HttpResponse("Movie not found", status=404)
+    return render(request, 'movie_not_found.html')
